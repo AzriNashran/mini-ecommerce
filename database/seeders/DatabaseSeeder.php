@@ -46,14 +46,13 @@ class DatabaseSeeder extends Seeder
 
         foreach (range(1,60) as $i) {
             $customer = $customers->random();
+            // Generate random date within the last 6 months
+            $randomDate = Carbon::now()->subDays(rand(0, 180))->toDateString();
             $order = Order::create([
                 'customer_id' => $customer->id,
-                'order_date' => Carbon::now()->toDateString(),
+                'order_date' => $randomDate,
                 'total_amount' => 0
             ]);
-            
-            // Set order_date to match created_at
-            $order->update(['order_date' => $order->created_at->toDateString()]);
 
             $itemsCount = rand(1,4);
             $total = 0;
