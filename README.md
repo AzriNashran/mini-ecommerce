@@ -16,7 +16,7 @@
 
 2. **Install PHP dependencies**
    ```bash
-   composer install or php composer.phar
+   composer install or php composer.phar install
    ```
 
 3. **Install Node.js dependencies**
