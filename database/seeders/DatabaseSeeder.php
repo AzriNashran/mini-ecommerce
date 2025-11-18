@@ -3,14 +3,22 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\{Customer, Category, Product, Order, OrderItem};
+use App\Models\{Customer, Category, Product, Order, OrderItem, User};
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 
 class DatabaseSeeder extends Seeder
 {
     public function run()
     {
+        // Create admin user
+        User::create([
+            'name' => 'admin',
+            'email' => 'admin@app.com',
+            'password' => Hash::make('Password1'),
+        ]);
+
         $categories = collect(['Electronics','Accessories','Home','Books','Toys'])
             ->map(fn($name) => Category::create(['name' => $name]));
 
@@ -22,7 +30,12 @@ class DatabaseSeeder extends Seeder
             ]);
         });
 
-        $states = ['Selangor','Kuala Lumpur','Johor','Penang','Sabah'];
+        $states = [
+            'Johor', 'Kedah', 'Kelantan', 'Melaka', 'Negeri Sembilan',
+            'Pahang', 'Perak', 'Perlis', 'Pulau Pinang', 'Sabah',
+            'Sarawak', 'Selangor', 'Terengganu',
+            'Kuala Lumpur', 'Labuan', 'Putrajaya'
+        ];
         $customers = collect(range(1,15))->map(function($i) use ($states) {
             return Customer::create([
                 'name' => 'Customer '.$i,
@@ -33,12 +46,14 @@ class DatabaseSeeder extends Seeder
 
         foreach (range(1,60) as $i) {
             $customer = $customers->random();
-            $orderDate = Carbon::now()->subDays(rand(0, 120));
             $order = Order::create([
                 'customer_id' => $customer->id,
-                'order_date' => $orderDate->toDateString(),
+                'order_date' => Carbon::now()->toDateString(),
                 'total_amount' => 0
             ]);
+            
+            // Set order_date to match created_at
+            $order->update(['order_date' => $order->created_at->toDateString()]);
 
             $itemsCount = rand(1,4);
             $total = 0;
