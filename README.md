@@ -1,20 +1,3 @@
-# Mini Ecommerce - Report
-
-A Laravel-based e-commerce reporting system that provides comprehensive order analytics, revenue tracking, and product performance insights.
-
-## Features
-
-- **User Authentication**: Secure login system with Laravel Breeze
-- **Order Management**: Track orders with customer information and order items
-- **Reporting Dashboard**: View comprehensive reports including:
-  - Total orders and revenue
-  - Average order value
-  - Top products by sales
-  - Detailed order breakdowns
-- **Data Export**: Export reports to Excel format
-- **Date Filtering**: Filter reports by date range
-- **Malaysian States Support**: Customer data includes all 16 Malaysian states and federal territories
-
 ## Requirements
 
 - PHP >= 8.2
@@ -27,13 +10,13 @@ A Laravel-based e-commerce reporting system that provides comprehensive order an
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/AzriNashran/mini-ecommerce.git
    cd mini-ecommerce
    ```
 
 2. **Install PHP dependencies**
    ```bash
-   composer install
+   composer install or php composer.phar
    ```
 
 3. **Install Node.js dependencies**
@@ -76,7 +59,7 @@ A Laravel-based e-commerce reporting system that provides comprehensive order an
 
    The application will be available at `http://localhost:8000`
 
-## Database Seeding Instructions
+## Database Seeding
 
 The seeder will create sample data including:
 - 1 admin user
@@ -104,36 +87,7 @@ After seeding, you can log in with:
 - **Email**: `admin@app.com`
 - **Password**: `Password1`
 
-## Project Structure
-
-```
-mini-ecommerce/
-├── app/
-│   ├── Exports/          # Excel export classes
-│   ├── Http/
-│   │   └── Controllers/   # Application controllers
-│   └── Models/            # Eloquent models
-├── database/
-│   ├── migrations/        # Database migrations
-│   └── seeders/          # Database seeders
-├── resources/
-│   ├── views/            # Blade templates
-│   │   ├── auth/         # Authentication views
-│   │   ├── layouts/      # Layout templates
-│   │   └── report/       # Report views
-│   ├── css/              # Stylesheets
-│   └── js/               # JavaScript files
-└── routes/
-    ├── web.php           # Web routes
-    └── auth.php          # Authentication routes
-```
-
-## Key Features Explained
-
-### Authentication
-- The root route (`/`) redirects unauthenticated users to the login page
-- Authenticated users are redirected to the dashboard
-- Protected routes require authentication
+## Key Features
 
 ### Reporting System
 - Access reports at `/report`
@@ -150,23 +104,24 @@ mini-ecommerce/
 - **Orders**: Order records with customer relationships
 - **OrderItems**: Individual items within orders
 
+#### Model Relationships
+- **Customer** `hasMany` **Orders**
+- **Order** `belongsTo` **Customer**
+- **Order** `hasMany` **OrderItems**
+- **OrderItem** `belongsTo` **Product**
+- **Product** `belongsTo` **Category**
+
 ## Assumptions and Notes
 
 1. **Database**: The project uses MySQL by default, but can be configured to use SQLite or other databases supported by Laravel.
 
 2. **Order Dates**: The `order_date` field is automatically set to match the `created_at` timestamp when orders are created via the seeder.
 
-3. **Malaysian States**: The seeder includes all 13 Malaysian states and 3 federal territories:
-   - States: Johor, Kedah, Kelantan, Melaka, Negeri Sembilan, Pahang, Perak, Perlis, Pulau Pinang, Sabah, Sarawak, Selangor, Terengganu
-   - Federal Territories: Kuala Lumpur, Labuan, Putrajaya
+3. **Authentication**: Laravel Breeze is used for authentication.
 
-4. **Currency**: All monetary values are displayed in Malaysian Ringgit (RM).
+4. **Excel Export**: The project uses the `maatwebsite/excel` package for exporting reports to Excel format.
 
-5. **Authentication**: Laravel Breeze is used for authentication, providing a simple, clean authentication scaffolding.
-
-6. **Excel Export**: The project uses the `maatwebsite/excel` package for exporting reports to Excel format.
-
-7. **Styling**: The project uses Bootstrap 5 and Tailwind CSS for styling.
+5. **Styling**: The project uses Bootstrap 5 and Tailwind CSS for styling.
 
 ## Development
 
@@ -189,7 +144,3 @@ npm run build
 ## License
 
 This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-
-## Support
-
-For issues, questions, or contributions, please open an issue on the GitHub repository.
