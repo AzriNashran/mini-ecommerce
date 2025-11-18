@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
       <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-        Product Order Summary Report
+        Product Order Summary
       </h2>
     </x-slot>
 
@@ -16,8 +16,9 @@
                     <button class="btn btn-sm btn-primary" type="submit">Search</button>
                   </form>
                   @if(isset($start) && isset($end) && $start && $end)
-                    <a href="{{ route('report.export', ['start' => $start->toDateString(), 'end' => $end->toDateString()]) }}" class="btn btn-success btn-sm ms-2">Download Excel</a>
+                    <a href="{{ route('report.index') }}" class="btn btn-sm btn-outline-secondary ms-2">Reset</a>                    
                   @endif
+                  <a href="{{ route('report.export', ['start' => isset($start) && $start ? $start->toDateString() : '', 'end' => isset($end) && $end ? $end->toDateString() : '']) }}" class="btn btn-success btn-sm ms-2">Download Excel</a>
                 </div>
               </div>
 
