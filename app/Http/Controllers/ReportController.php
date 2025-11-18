@@ -13,45 +13,61 @@ class ReportController extends Controller
 {
   public function index(Request $request)
   {
-    // date range default: last 30 days
-    $end = $request->input('end') ? Carbon::parse($request->input('end'))->endOfDay() : Carbon::now()->endOfDay();
-    $start = $request->input('start') ? Carbon::parse($request->input('start'))->startOfDay() : Carbon::now()->subDays(30)->startOfDay();
+    // date range is optional
+    $start = $request->input('start') ? Carbon::parse($request->input('start'))->startOfDay() : null;
+    $end = $request->input('end') ? Carbon::parse($request->input('end'))->endOfDay() : null;
 
     // Summary: 1) total orders (separate query)
-    $totalOrders = Order::whereBetween('order_date', [$start->toDateString(), $end->toDateString()])->count();
+    $totalOrdersQuery = Order::query();
+    if ($start && $end) {
+      $totalOrdersQuery->whereBetween('order_date', [$start->toDateString(), $end->toDateString()]);
+    }
+    $totalOrders = $totalOrdersQuery->count();
 
     // 2) total revenue
-    $totalRevenue = Order::whereBetween('order_date', [$start->toDateString(), $end->toDateString()])->sum('total_amount');
+    $totalRevenueQuery = Order::query();
+    if ($start && $end) {
+      $totalRevenueQuery->whereBetween('order_date', [$start->toDateString(), $end->toDateString()]);
+    }
+    $totalRevenue = $totalRevenueQuery->sum('total_amount');
 
     // 3) top 3 best-selling products (separate query)
-    $topProducts = OrderItem::selectRaw('product_id, SUM(quantity) as total_qty')
+    $topProductsQuery = OrderItem::selectRaw('product_id, SUM(quantity) as total_qty')
     ->whereHas('order', function ($q) use ($start, $end) {
-      $q->whereBetween('order_date', [$start->toDateString(), $end->toDateString()]);
+      if ($start && $end) {
+        $q->whereBetween('order_date', [$start->toDateString(), $end->toDateString()]);
+      }
     })
     ->with('product')
     ->groupBy('product_id')
     ->orderByDesc('total_qty')
-    ->limit(3)
-    ->get();
+    ->limit(3);
+    $topProducts = $topProductsQuery->get();
 
     // 4) average order value
     $avgOrderValue = $totalOrders ? round($totalRevenue / $totalOrders, 2) : 0;
 
     // Detailed table: paginate order items with eager relationships (prevent N+1)
-    $orderItems = OrderItem::with(['order.customer', 'product.category'])
+    $orderItemsQuery = OrderItem::with(['order.customer', 'product.category'])
     ->join('orders', 'order_items.order_id', '=', 'orders.id')
-    ->whereBetween('orders.order_date', [$start->toDateString(), $end->toDateString()])
-    ->select('order_items.*')
-    ->orderBy('orders.order_date', 'desc')
-    ->paginate(15);
+    ->select('order_items.*');
+    if ($start && $end) {
+      $orderItemsQuery->whereBetween('orders.order_date', [$start->toDateString(), $end->toDateString()]);
+    }
+    $orderItems = $orderItemsQuery->orderBy('orders.order_date', 'desc')->paginate(15);
 
     return view('report.index', compact('orderItems','totalOrders','totalRevenue','topProducts','avgOrderValue','start','end'));
   }
 
   public function export(Request $request)
   {
-    $start = $request->input('start') ? Carbon::parse($request->input('start'))->toDateString() : Carbon::now()->subDays(30)->toDateString();
-    $end = $request->input('end') ? Carbon::parse($request->input('end'))->toDateString() : Carbon::now()->toDateString();
+    $start = $request->input('start') ? Carbon::parse($request->input('start'))->toDateString() : null;
+    $end = $request->input('end') ? Carbon::parse($request->input('end'))->toDateString() : null;
+    
+    if (!$start || !$end) {
+      return redirect()->back()->with('error', 'Please select a date range to export.');
+    }
+    
     $fileName = "product-order-summary-{$start}_to_{$end}.xlsx";
     return Excel::download(new ReportExport($start, $end), $fileName);
   }
