@@ -13,25 +13,24 @@ class ReportController extends Controller
 {
   public function index(Request $request)
   {
-    // date range is optional
     $start = $request->input('start') ? Carbon::parse($request->input('start'))->startOfDay() : null;
     $end = $request->input('end') ? Carbon::parse($request->input('end'))->endOfDay() : null;
 
-    // Summary: 1) total orders (separate query)
+    //total orders
     $totalOrdersQuery = Order::query();
     if ($start && $end) {
       $totalOrdersQuery->whereBetween('order_date', [$start->toDateString(), $end->toDateString()]);
     }
     $totalOrders = $totalOrdersQuery->count();
 
-    // 2) total revenue
+    //total revenue
     $totalRevenueQuery = Order::query();
     if ($start && $end) {
       $totalRevenueQuery->whereBetween('order_date', [$start->toDateString(), $end->toDateString()]);
     }
     $totalRevenue = $totalRevenueQuery->sum('total_amount');
 
-    // 3) top 3 best-selling products (separate query)
+    //top 3 products
     $topProductsQuery = OrderItem::selectRaw('product_id, SUM(quantity) as total_qty')
     ->whereHas('order', function ($q) use ($start, $end) {
       if ($start && $end) {
@@ -44,10 +43,10 @@ class ReportController extends Controller
     ->limit(3);
     $topProducts = $topProductsQuery->get();
 
-    // 4) average order value
+    //average order value
     $avgOrderValue = $totalOrders ? round($totalRevenue / $totalOrders, 2) : 0;
 
-    // Detailed table: paginate order items with eager relationships (prevent N+1)
+    //order items
     $orderItemsQuery = OrderItem::with(['order.customer', 'product.category'])
     ->join('orders', 'order_items.order_id', '=', 'orders.id')
     ->select('order_items.*');
@@ -64,11 +63,12 @@ class ReportController extends Controller
     $start = $request->input('start') ? Carbon::parse($request->input('start'))->toDateString() : null;
     $end = $request->input('end') ? Carbon::parse($request->input('end'))->toDateString() : null;
     
-    if (!$start || !$end) {
-      return redirect()->back()->with('error', 'Please select a date range to export.');
+    if ($start && $end) {
+      $fileName = "product-order-summary-{$start}_to_{$end}.xlsx";
+    } else {
+      $fileName = "product-order-summary-all.xlsx";
     }
     
-    $fileName = "product-order-summary-{$start}_to_{$end}.xlsx";
     return Excel::download(new ReportExport($start, $end), $fileName);
   }
 }

@@ -11,11 +11,9 @@ class DatabaseSeeder extends Seeder
 {
     public function run()
     {
-        // Create categories
         $categories = collect(['Electronics','Accessories','Home','Books','Toys'])
             ->map(fn($name) => Category::create(['name' => $name]));
 
-        // Create products
         $products = collect(range(1,20))->map(function($i) use ($categories){
             return Product::create([
                 'name' => 'Product '.$i,
@@ -24,7 +22,6 @@ class DatabaseSeeder extends Seeder
             ]);
         });
 
-        // Customers
         $states = ['Selangor','Kuala Lumpur','Johor','Penang','Sabah'];
         $customers = collect(range(1,15))->map(function($i) use ($states) {
             return Customer::create([
@@ -34,14 +31,13 @@ class DatabaseSeeder extends Seeder
             ]);
         });
 
-        // Orders + items
         foreach (range(1,60) as $i) {
             $customer = $customers->random();
             $orderDate = Carbon::now()->subDays(rand(0, 120));
             $order = Order::create([
                 'customer_id' => $customer->id,
                 'order_date' => $orderDate->toDateString(),
-                'total_amount' => 0 // update below
+                'total_amount' => 0
             ]);
 
             $itemsCount = rand(1,4);
