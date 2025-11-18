@@ -1,59 +1,195 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Mini Ecommerce - Report
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A Laravel-based e-commerce reporting system that provides comprehensive order analytics, revenue tracking, and product performance insights.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **User Authentication**: Secure login system with Laravel Breeze
+- **Order Management**: Track orders with customer information and order items
+- **Reporting Dashboard**: View comprehensive reports including:
+  - Total orders and revenue
+  - Average order value
+  - Top products by sales
+  - Detailed order breakdowns
+- **Data Export**: Export reports to Excel format
+- **Date Filtering**: Filter reports by date range
+- **Malaysian States Support**: Customer data includes all 16 Malaysian states and federal territories
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Requirements
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP >= 8.2
+- Composer
+- Node.js and npm
+- MySQL
+- Laravel 12.0
 
-## Learning Laravel
+## Installation Steps
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd mini-ecommerce
+   ```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+2. **Install PHP dependencies**
+   ```bash
+   composer install
+   ```
 
-## Laravel Sponsors
+3. **Install Node.js dependencies**
+   ```bash
+   npm install
+   ```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+4. **Environment Configuration**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
 
-### Premium Partners
+5. **Configure Database**
+   
+   Edit the `.env` file and set your database credentials:
+   ```env
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=mini_ecommerce
+   DB_USERNAME=your_username
+   DB_PASSWORD=your_password
+   ```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+6. **Run Migrations**
+   ```bash
+   php artisan migrate
+   ```
 
-## Contributing
+7. **Build Assets**
+   ```bash
+   npm run build
+   ```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+8. **Start the Development Server**
+   ```bash
+   php artisan serve
+   ```
 
-## Code of Conduct
+   The application will be available at `http://localhost:8000`
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Database Seeding Instructions
 
-## Security Vulnerabilities
+The seeder will create sample data including:
+- 1 admin user
+- 5 product categories (Electronics, Accessories, Home, Books, Toys)
+- 20 products with random prices
+- 15 customers from various Malaysian states
+- 60 orders with order items
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+**To seed the database:**
+
+```bash
+php artisan db:seed
+```
+
+Or if you want to refresh the database and reseed:
+
+```bash
+php artisan migrate:fresh --seed
+```
+
+### Default Admin Credentials
+
+After seeding, you can log in with:
+
+- **Email**: `admin@app.com`
+- **Password**: `Password1`
+
+## Project Structure
+
+```
+mini-ecommerce/
+├── app/
+│   ├── Exports/          # Excel export classes
+│   ├── Http/
+│   │   └── Controllers/   # Application controllers
+│   └── Models/            # Eloquent models
+├── database/
+│   ├── migrations/        # Database migrations
+│   └── seeders/          # Database seeders
+├── resources/
+│   ├── views/            # Blade templates
+│   │   ├── auth/         # Authentication views
+│   │   ├── layouts/      # Layout templates
+│   │   └── report/       # Report views
+│   ├── css/              # Stylesheets
+│   └── js/               # JavaScript files
+└── routes/
+    ├── web.php           # Web routes
+    └── auth.php          # Authentication routes
+```
+
+## Key Features Explained
+
+### Authentication
+- The root route (`/`) redirects unauthenticated users to the login page
+- Authenticated users are redirected to the dashboard
+- Protected routes require authentication
+
+### Reporting System
+- Access reports at `/report`
+- Filter orders by date range
+- View summary statistics (total orders, revenue, average order value)
+- See top 3 products by quantity sold
+- Export data to Excel format
+
+### Data Models
+- **Users**: Admin and regular users
+- **Customers**: Customer information with Malaysian state data
+- **Categories**: Product categories
+- **Products**: Product catalog with pricing
+- **Orders**: Order records with customer relationships
+- **OrderItems**: Individual items within orders
+
+## Assumptions and Notes
+
+1. **Database**: The project uses MySQL by default, but can be configured to use SQLite or other databases supported by Laravel.
+
+2. **Order Dates**: The `order_date` field is automatically set to match the `created_at` timestamp when orders are created via the seeder.
+
+3. **Malaysian States**: The seeder includes all 13 Malaysian states and 3 federal territories:
+   - States: Johor, Kedah, Kelantan, Melaka, Negeri Sembilan, Pahang, Perak, Perlis, Pulau Pinang, Sabah, Sarawak, Selangor, Terengganu
+   - Federal Territories: Kuala Lumpur, Labuan, Putrajaya
+
+4. **Currency**: All monetary values are displayed in Malaysian Ringgit (RM).
+
+5. **Authentication**: Laravel Breeze is used for authentication, providing a simple, clean authentication scaffolding.
+
+6. **Excel Export**: The project uses the `maatwebsite/excel` package for exporting reports to Excel format.
+
+7. **Styling**: The project uses Bootstrap 5 and Tailwind CSS for styling.
+
+## Development
+
+### Running Tests
+```bash
+php artisan test
+```
+
+### Code Style
+The project uses Laravel Pint for code formatting:
+```bash
+./vendor/bin/pint
+```
+
+### Building Assets for Production
+```bash
+npm run build
+```
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## Support
+
+For issues, questions, or contributions, please open an issue on the GitHub repository.
